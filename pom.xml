@@ -6,6 +6,7 @@
 	<artifactId>tools.gui.suggestfield</artifactId>
 	<version>1.0.0</version>
 	<name>SuggestField</name>
+	<url>https://github.com/srsoftware-de/SuggestField</url>
 	<organization>
 		<name>SRSoftware</name>
 		<url>https://srsoftware.de</url>
@@ -26,6 +27,13 @@
 			<organizationUrl>http://www.srsoftware.de</organizationUrl>
 		</developer>
 	</developers>
+	
+		<scm>
+		<connection>scm:git:git://github.com/keawe-software/SuggestField.git</connection>
+		<developerConnection>scm:git:git@github.com:keawe-software/SuggestField.git</developerConnection>
+		<url>https://github.com/keawe-software/SuggestField</url>
+		<tag>HEAD</tag>
+	</scm>
 
 	<build>
 		<plugins>
