@@ -1,5 +1,6 @@
 package de.srsoftware.tools.gui;
 
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -18,9 +19,11 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
+import javax.swing.WindowConstants;
 
 import de.srsoftware.tools.PrefixTree;
 
@@ -63,12 +66,10 @@ public class SuggestField extends JTextField implements KeyListener, ActionListe
 		}
 	}
 
-
-
-
-
-
-
+	private void hidePopup() {
+		suggestionList.setVisible(false);
+	}
+	
 	public void keyPressed(KeyEvent e) {}
 
 	public void keyReleased(KeyEvent e) {
@@ -117,13 +118,7 @@ public class SuggestField extends JTextField implements KeyListener, ActionListe
 		}
 	}
 	
-	private void hidePopup() {
-		suggestionList.setVisible(false);
-	}
-
 	public void keyTyped(KeyEvent e) {}
-
-
 
 	private String lastWord(String text) {
 		if (text == null) return null;
@@ -231,5 +226,21 @@ public class SuggestField extends JTextField implements KeyListener, ActionListe
 			setText(text + ins);
 			hidePopup();
 		}
+	}
+	
+	/**
+	 * Demo
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		SuggestField sf = new SuggestField();
+		sf.setPreferredSize(new Dimension(640,150));
+
+		JFrame window = new JFrame("Test");
+		window.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+		window.add(sf);
+		window.pack();
+		window.setVisible(true);
+		
 	}
 }

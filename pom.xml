@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>de.srsoftware</groupId>
 	<artifactId>tools.gui.suggestfield</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<name>SuggestField</name>
 	<url>https://github.com/srsoftware-de/SuggestField</url>
 	<organization>
