@@ -37,7 +37,7 @@ public class SuggestField extends JTextField implements KeyListener, ActionListe
 	private int selectionIndex = -1;
 	private static int maxNumberOfSuggestions = 20;
 	private Point pos = null;
-	private Vector<String> suggestions;
+	private Vector<String> suggestions = new Vector<String>();
 
 	public SuggestField() {
 		this(true);
@@ -91,6 +91,7 @@ public class SuggestField extends JTextField implements KeyListener, ActionListe
 			}
 		} else {
 			if (keyChar==KeyEvent.VK_DELETE){
+				if (selectionIndex<0) return;
 				String word=suggestions.get(selectionIndex);
 				dictionary.remove(word);
 				selectionIndex=-1;
