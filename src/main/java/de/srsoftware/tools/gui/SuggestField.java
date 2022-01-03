@@ -6,15 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
@@ -30,26 +21,21 @@ import de.srsoftware.tools.PrefixTree;
 public class SuggestField extends JTextField implements KeyListener, ActionListener {
 
 	private static final long serialVersionUID = 4183066803864491291L;
-	private static PrefixTree dictionary = null;
-	private static File dictionaryFile = new File(System.getProperty("user.home") + "/.config/dictionary");
-	private static Charset charset = Charset.forName("UTF-8");
+	private PrefixTree dictionary = null;
+	
 	private JPopupMenu suggestionList;
 	private int selectionIndex = -1;
 	private static int maxNumberOfSuggestions = 20;
 	private Point pos = null;
 	private Vector<String> suggestions = new Vector<String>();
 
-	public SuggestField() {
-		this(true);
+	public SuggestField(PrefixTree dictionary) {
+		this(dictionary,true);
 	}
 
-	public SuggestField(boolean ignoreCase) {
+	public SuggestField(PrefixTree dictionary, boolean ignoreCase) {
 		super();
-		try {
-			if (dictionary == null) loadSuggestions(ignoreCase);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		this.dictionary = dictionary;
 		addKeyListener(this);
 		suggestionList = new JPopupMenu();
 		// suggestionList.addKeyListener(this);
@@ -78,15 +64,15 @@ public class SuggestField extends JTextField implements KeyListener, ActionListe
 			int keyCode = e.getKeyCode();
 			switch (keyCode) {
 			case 38: // up
-				suggestionList.requestFocus();
+				//suggestionList.requestFocus();
 				selectionIndex--;
 				if (selectionIndex < 0) selectionIndex = suggestions.size() - 1;
 				break;
 			case 40: // down
-				suggestionList.requestFocus();
+				//suggestionList.requestFocus();
 				selectionIndex++;
 				if (selectionIndex == suggestions.size()) selectionIndex = 0;
-				System.out.println(selectionIndex);
+				//System.out.println(selectionIndex);
 				break;
 			}
 		} else {
@@ -98,9 +84,7 @@ public class SuggestField extends JTextField implements KeyListener, ActionListe
 			}
 			if (selectionIndex < 0) {
 				hidePopup();
-			} else {
-				useSuggestion(keyChar);
-			}
+			} else useSuggestion(keyChar);
 			String text = getText();
 			if (text.length() > 0) {
 				char lastChar = text.charAt(text.length() - 1);
@@ -108,15 +92,11 @@ public class SuggestField extends JTextField implements KeyListener, ActionListe
 				if (Character.isLetter(lastChar)) {
 					suggestFor(lastword);
 				} else {
-					if (lastword !=null && lastword.length() > 2) {
-						dictionary.add(lastword);
-					}
+					if (lastword !=null && lastword.length() > 2) dictionary.add(lastword);
 				}
 			}
 		}
-		if (getCaretPosition() < getText().length()) {
-			hidePopup();
-		}
+		if (getCaretPosition() < getText().length()) hidePopup();
 	}
 	
 	public void keyTyped(KeyEvent e) {}
@@ -129,36 +109,13 @@ public class SuggestField extends JTextField implements KeyListener, ActionListe
 		while (i-- > 1) {
 			char c = text.charAt(i - 1);
 			if (!Character.isLetter(c) && c != '-' && c != '\'') {
-				if (c=='\\'){
-					i--;
-				}
+				if (c=='\\') i--;
 				break;
 			}
 		}
 		return text.substring(i).trim();
 	}
-	
-	private void loadSuggestions(boolean ignoreCase) throws IOException {
-		dictionary = new PrefixTree(ignoreCase);
-		if (dictionaryFile.exists()) {
-			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(dictionaryFile), charset));
-			String line = null;
-			while ((line = br.readLine()) != null)
-				dictionary.add(line);
-			br.close();
-		}
-	}
-	
-	public static void save() throws IOException {
-		if (dictionary == null) return;
-		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(dictionaryFile), charset));
-		for (String line : dictionary.getAll()) {
-			bw.write(line.trim() + "\n");
-		}
-		bw.close();
-		// System.out.println("Suggestsions saved.");
-	}
-	
+		
 	private void suggestFor(String text) {
 		if (text == null) {
 			return;
@@ -171,10 +128,7 @@ public class SuggestField extends JTextField implements KeyListener, ActionListe
 			int len = suggestion.length();
 			if (len < minLength) continue;
 			Vector<String> list = map.get(len);
-			if (list == null) {
-				list = new Vector<String>();
-				map.put(len, list);
-			}
+			if (list == null) map.put(len, list = new Vector<String>());
 			list.add(suggestion);
 		}
 
@@ -204,6 +158,7 @@ public class SuggestField extends JTextField implements KeyListener, ActionListe
 			pos = getCaret().getMagicCaretPosition();
 			if (pos != null) {
 				suggestionList.show(this, pos.x - 10, pos.y + 20);
+				requestFocus();
 			}
 		}
 	}
@@ -234,9 +189,14 @@ public class SuggestField extends JTextField implements KeyListener, ActionListe
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		SuggestField sf = new SuggestField();
+		PrefixTree dict = new PrefixTree(true);
+		dict.add("Test");
+		dict.add("Tesa");
+		dict.add("Mops");
+		SuggestField sf = new SuggestField(dict);
+		sf.setText("Words in Dictionary: Test, Tesa and Mops");
 		sf.setPreferredSize(new Dimension(640,150));
-
+		sf.selectAll();
 		JFrame window = new JFrame("Test");
 		window.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		window.add(sf);
